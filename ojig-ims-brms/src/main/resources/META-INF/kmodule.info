@@ -1,0 +1,11 @@
+<org.drools.core.rule.KieModuleMetaInfo>
+  <typeMetaInfos/>
+  <rulesByPackage>
+    <entry>
+      <set>
+        <string>eval-loc-based-quote</string>
+        <string>eval-time-based-quote</string>
+      </set>
+    </entry>
+  </rulesByPackage>
+</org.drools.core.rule.KieModuleMetaInfo>

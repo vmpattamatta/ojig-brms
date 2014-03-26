@@ -1,0 +1,85 @@
+//created on: Mar 17, 2014
+
+import java.util.Date;
+import java.lang.Double;
+import java.util.Calendar;
+import za.co.sita.ojig.brms.util.DBUtil;
+import za.co.sita.ojig.ims.hib.bean.Incident;
+
+global Incident incident;
+global DBUtil util;
+
+rule "eval-loc-based-quote"
+	no-loop true
+	ruleflow-group "eval-quote"
+	dialect "java" 
+	salience 2
+		when
+		then
+			double d = util.quoteForLocation(incident.getLat(),incident.getLng()) ;
+			if(d == -1){
+				incident.setQuoteAmt(0d);
+	    		incident.setStatus(util.getStatusFromId(9));
+	    		incident.setComment("Cannot evaluate location based quote");
+	    	} else {
+				incident.setQuoteAmt(d);
+		    	incident.setStatus(util.getStatusFromId(2));
+	    		incident.setComment("Evaluated location based quote");
+	    	}
+		    util.updateIncident(incident);
+end
+
+rule "eval-time-based-quote"
+	no-loop true
+	ruleflow-group "eval-quote"
+	dialect "java" 
+	salience 1
+		when
+		then
+			if( incident.getDateAdded() != null && incident.getQuoteAmt() != 0){
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(incident.getDateAdded());
+				int m = cal.get(Calendar.MONTH);
+				switch (m) {
+				case Calendar.JANUARY:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.02));
+					break;
+				case Calendar.FEBRUARY:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.04));
+					break;
+				case Calendar.MARCH:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.06));
+					break;
+				case Calendar.APRIL:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.08));
+					break;
+				case Calendar.MAY:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.10));
+					break;
+				case Calendar.JUNE:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.12));
+					break;
+				case Calendar.JULY:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.14));
+					break;
+				case Calendar.AUGUST:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.16));
+					break;
+				case Calendar.SEPTEMBER:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.18));
+					break;
+				case Calendar.OCTOBER:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.20));
+					break;
+				case Calendar.NOVEMBER:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.22));
+					break;
+				case Calendar.DECEMBER:
+					incident.setQuoteAmt(incident.getQuoteAmt() * (1.24));
+					break;
+				}
+		    	incident.setStatus(util.getStatusFromId(2));
+		    	incident.setComment("Evaluated Time Based Quote");
+			    util.updateIncident(incident);
+			}
+end
